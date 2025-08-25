@@ -1,3 +1,3 @@
-module github.com/secsy/goftp
+module github.com/tonymet/goftp
 
 go 1.24.6
