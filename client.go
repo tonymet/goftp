@@ -31,6 +31,9 @@ type Error interface {
 	// Similarly, this will return the text response from the server, or empty
 	// string.
 	Message() string
+
+	// implement Unwrap interface
+	Unwrap() error
 }
 
 type ftpError struct {
@@ -69,6 +72,10 @@ func (e ftpError) Message() string {
 		return fe.Message()
 	}
 	return e.msg
+}
+
+func (e ftpError) Unwrap() error {
+	return e.err
 }
 
 // TLSMode represents the FTPS connection strategy. Servers cannot support
