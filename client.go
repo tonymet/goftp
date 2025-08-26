@@ -239,6 +239,15 @@ func (c *Client) Close() error {
 	return nil
 }
 
+func (c *Client) Noop() error {
+	pconn, err := c.getIdleConn()
+	if err != nil {
+		return err
+	}
+	defer c.returnConn(pconn)
+	return pconn.sendCommandExpected(replyCommandOkay, "NOOP")
+}
+
 // Log a debug message in the context of the client (i.e. not for a
 // particular connection).
 func (c *Client) debug(f string, args ...interface{}) {
