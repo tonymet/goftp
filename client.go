@@ -31,6 +31,9 @@ type Error interface {
 	// Similarly, this will return the text response from the server, or empty
 	// string.
 	Message() string
+
+	// implement Unwrap interface
+	Unwrap() error
 }
 
 type ftpError struct {
@@ -69,6 +72,10 @@ func (e ftpError) Message() string {
 		return fe.Message()
 	}
 	return e.msg
+}
+
+func (e ftpError) Unwrap() error {
+	return e.err
 }
 
 // TLSMode represents the FTPS connection strategy. Servers cannot support
@@ -230,6 +237,15 @@ func (c *Client) Close() error {
 	}
 
 	return nil
+}
+
+func (c *Client) Noop() error {
+	pconn, err := c.getIdleConn()
+	if err != nil {
+		return err
+	}
+	defer c.returnConn(pconn)
+	return pconn.sendCommandExpected(replyCommandOkay, "NOOP")
 }
 
 // Log a debug message in the context of the client (i.e. not for a
